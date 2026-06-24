@@ -41,7 +41,6 @@ BikeStore/
 
 The database consists of **9 normalized tables** connected via primary and foreign keys.
 
-![Database Schema](querry%20results%20screenshots/database_relationship_bike_store.png)
 
 | Table | Description |
 |---|---|
@@ -64,7 +63,6 @@ Six analytical views were created to support reporting without repeating complex
 ### `vw_StoreSalesSummary`
 Aggregates total orders, total revenue, and average order value per store.
 
-![Store Sales Summary](querry%20results%20screenshots/vw_storesalessummary.png)
 
 ### `vw_TopSellingProducts`
 Ranks products by total units sold and total revenue using `DENSE_RANK()`.
@@ -72,20 +70,14 @@ Ranks products by total units sold and total revenue using `DENSE_RANK()`.
 ### `vw_InventoryStatus`
 Labels each product-store combination as `sufficient`, `low`, `critical`, or `out of stock` based on stock quantity.
 
-![Inventory Status](querry%20results%20screenshots/vw_inventorystatus.png)
-
 ### `vw_StaffPerformance`
 Shows total orders handled and revenue generated per staff member.
 
 ### `vw_RegionalTrends`
 Breaks down total orders and revenue by city and state.
 
-![Regional Trends](querry%20results%20screenshots/vw_regionaltrends.png)
-
 ### `vw_SalesByCategory`
 Sales volume, total revenue, and discount rate per product category.
-
-![Sales by Category](querry%20results%20screenshots/vw_SalesByCategory.png)
 
 ---
 
@@ -102,8 +94,6 @@ Returns a full KPI report for a single store in one call:
 ```sql
 EXEC sp_CalculateStoreKPI @store_id = 1;
 ```
-![Store KPI](querry%20results%20screenshots/calcukate%20store%20KPI%20stored%20proc.png)
-
 ---
 
 ### `sp_GenerateRestockList` — `@store_id`, `@threshold` (optional, default 10)
@@ -122,8 +112,6 @@ Side-by-side comparison of two years: total orders, units sold, revenue, AOV, an
 ```sql
 EXEC sp_CompareSalesYearOverYear @year1 = 2017, @year2 = 2018;
 ```
-![Year Over Year](querry%20results%20screenshots/compare%20sales%20over%20year%20Stored%20proc.png)
-
 > **Key finding:** Revenue dropped **-47.36%** from 2017 to 2018 (3,447 → 1,814 orders).
 
 ---
@@ -137,8 +125,6 @@ Full 360° customer view:
 ```sql
 EXEC sp_GetCustomerProfile @customer_id = 1;
 ```
-![Customer Profile](querry%20results%20screenshots/get_custimer%20profile%20stored%20proc.png)
-
 ---
 
 ## 📈 Business KPIs
@@ -149,7 +135,6 @@ EXEC sp_GetCustomerProfile @customer_id = 1;
 SELECT SUM(total_revenue) AS company_total_revenue
 FROM vw_StoreSalesSummary;
 ```
-![Total Revenue](querry%20results%20screenshots/company%27s%20total%20revenue%20KPI.png)
 
 > **$7,689,116.56** across all stores and years.
 
@@ -161,8 +146,6 @@ FROM vw_StoreSalesSummary;
 SELECT store_name, avg_order_value
 FROM vw_StoreSalesSummary;
 ```
-![AOV](querry%20results%20screenshots/average%20order%20value%20KPI.png)
-
 | Store | AOV |
 |---|---|
 | Rowlett Bikes | $4,985.87 |
@@ -178,8 +161,6 @@ SELECT store_name, total_revenue, total_orders
 FROM vw_StoreSalesSummary
 ORDER BY total_revenue DESC;
 ```
-![Revenue by Store](querry%20results%20screenshots/revenue_by_store_KPI.png)
-
 | Store | Revenue | Orders |
 |---|---|---|
 | Baldwin Bikes | $5,215,751.28 | 1,093 |
@@ -195,8 +176,6 @@ SELECT category_name, total_revenue, total_discount_given, discount_rate_pct
 FROM vw_SalesByCategory
 ORDER BY total_revenue DESC;
 ```
-![Gross Profit by Category](querry%20results%20screenshots/gross_profit_per_category_KPI.png)
-
 > **Mountain Bikes** leads with **$2,715,079** in revenue.
 
 ---
@@ -207,8 +186,6 @@ ORDER BY total_revenue DESC;
 SELECT * FROM vw_SalesByBrand
 ORDER BY brand_id;
 ```
-![Sales by Brand](querry%20results%20screenshots/sales_by_brand_KPI.png)
-
 > **Trek** is the top brand: **$4,602,754** revenue, **1,839** units sold.
 
 ---
@@ -220,8 +197,6 @@ SELECT staff_name, total_orders, total_revenue
 FROM vw_StaffPerformance
 ORDER BY total_revenue DESC;
 ```
-![Staff Revenue](querry%20results%20screenshots/staff_revenue_KPI.png)
-
 > **Marcelene Boyer** leads: **553 orders**, **$2,624,120** in revenue.
 
 ---
@@ -233,19 +208,11 @@ SELECT store_name, product_name, stock_quantity, stock_status
 FROM vw_InventoryStatus
 ORDER BY stock_quantity DESC;
 ```
-![Slow Items](querry%20results%20screenshots/items_moving_slow_KPI.png)
-
 ---
 
 ## 🤖 SQL Server Agent — Automated Daily Job
 
 A SQL Server Agent job (`BikeStore_Daily_Job`) was configured to run automatically on a daily schedule, keeping all views and KPI data up to date without manual intervention.
-
-![Agent Job Setup](sql%20server%20agent%20job%20setup/sql_server%20agent_1.png)
-![Agent Job Steps](sql%20server%20agent%20job%20setup/server%20agent_%20steps_2.png)
-![Agent Job Schedule](sql%20server%20agent%20job%20setup/sql_server_agent_schedules%20.png)
-
----
 
 ## 🛠️ Technologies Used
 

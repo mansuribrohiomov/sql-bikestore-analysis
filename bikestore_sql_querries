@@ -1,0 +1,678 @@
+create database BikeStore
+go 
+use BikeStore
+
+drop table if exists customers
+create table customers 
+(
+customer_id int primary key,
+first_name varchar(100),
+last_name varchar(100),
+phone int,
+email varchar(100),
+street varchar(100),
+city varchar(100),
+state varchar(100),
+zip_code int
+)
+drop table if exists orders
+create table orders (
+order_id int primary key,
+customer_id int,
+order_status int,
+order_date date,
+required_date date,
+shipped_date date,
+store_id int,
+staff_id int
+)
+
+
+drop table if exists staffs;
+
+create table staffs (
+    staff_id    int,
+    first_name  varchar(100),
+    last_name   varchar(100),
+    email       varchar(100),
+    phone       varchar(20),    
+    active      varchar(30),
+    store_id    int,
+    manager_id  int null     
+);
+
+drop table if exists stores 
+create table stores (
+store_id int primary key,
+store_name varchar(100),
+phone int,
+email varchar(100),
+street varchar(100),
+city varchar(100),
+state varchar(100),
+zip_code int
+)
+
+
+drop table if exists order_items 
+
+create table order_items(
+order_id int primary key,
+item_id int,
+product_id int,
+quantity int,
+list_price decimal(10,2),
+discount decimal(4,2)
+)
+drop table if exists categories 
+
+create table categories (
+category_id int primary key,
+category_name varchar(100)
+)
+drop table if exists products
+create table products(
+product_id int primary key,
+product_name varchar(100),
+brand_id int,
+category_id int,
+model_year smallint,
+list_price decimal(10,2)
+)
+
+drop table if exists stocks
+create table stocks (
+store_id int ,
+product_id int,
+quantity int
+)
+drop table if exists brands 
+
+create table brands(
+brand_id int primary key,
+brand_name varchar(100)
+)
+--connecting tables using foreign key and primary key constraints
+alter table orders 
+add constraint fk_orders_customer
+foreign key(customer_id)
+references customers (customer_id)
+
+alter table orders
+add constraint fk_orders_store
+foreign key (store_id)
+references stores(store_id)
+
+alter table staffs
+alter column staff_id int not NUll
+
+alter table staffs
+add constraint pk_staffs
+primary key(staff_id)
+
+alter table orders
+add constraint fk_orders_staff
+foreign key (staff_id)
+references staffs(staff_id)
+
+alter table order_items
+add constraint fk_order_items_order
+foreign key (order_id)
+references orders(order_id)
+
+alter table order_items
+add constraint fk_order_items_product
+foreign key (product_id)
+references products(product_id)
+
+alter table order_items 
+alter column item_id int not NUll
+
+alter table order_items
+drop constraint PK__order_it__46596229D2E9C268
+
+alter table order_items
+add constraint pk_order_items
+primary key (order_id, item_id);
+
+alter table staffs
+alter column staff_id int not null;
+
+alter table staffs
+add constraint pk_staffs primary key (staff_id);
+
+alter table staffs
+add constraint fk_staffs_store
+foreign key (store_id)
+references stores(store_id)
+
+
+alter table staffs 
+add constraint fk_staffs_manager
+foreign key (manager_id)
+references staffs(staff_id)
+
+alter table stocks
+alter column store_id int not NUll
+
+
+alter table stocks
+alter column product_id int not NUll
+
+alter table stocks 
+add constraint PK_stocks
+primary key (store_id,product_id)
+
+alter table stocks
+add constraint fk_stocks_store
+foreign key(store_id) 
+references stores(store_id)
+
+alter table stocks
+add constraint fk_stocks_product
+foreign key(product_id) 
+references products(product_id)
+
+alter table products 
+add constraint fk_products_category
+foreign key (category_id)
+references categories(category_id)
+
+alter table products 
+add constraint fk_products_brand
+foreign key (brand_id)
+references brands(brand_id)
+
+--loading the informations into the tables 
+
+--brands
+bulk insert brands
+from 'C:\Users\User\Desktop\bikestoredatas\brands.csv'
+with (
+    format = 'CSV',
+    firstrow = 2,
+    fieldterminator = ',',
+    rowterminator = '\n',
+    tablock
+)
+
+bulk insert stocks
+from 'C:\Users\User\Desktop\bikestoredatas\stocks.csv'
+with (
+    format = 'CSV',
+    firstrow = 2,
+    fieldterminator = ',',
+    rowterminator = '\n',
+    tablock
+)
+
+
+
+bulk insert products
+from 'C:\Users\User\Desktop\bikestoredatas\products.csv'
+with (
+    format = 'CSV',
+    firstrow = 2,
+    fieldterminator = ',',
+    rowterminator = '\n',
+    tablock
+)
+
+bulk insert categories
+from 'C:\Users\User\Desktop\bikestoredatas\categories.csv'
+with (
+    format = 'CSV',
+    firstrow = 2,
+    fieldterminator = ',',
+    rowterminator = '\n',
+    tablock
+)
+
+
+bulk insert order_items
+from 'C:\Users\User\Desktop\bikestoredatas\order_items.csv'
+with (
+    format = 'CSV',
+    firstrow = 2,
+    fieldterminator = ',',
+    rowterminator = '\n',
+    tablock
+)
+
+
+bulk insert stores
+from 'C:\Users\User\Desktop\bikestoredatas\stores.csv'
+with (
+    format = 'CSV',
+    firstrow = 2,
+    fieldterminator = ',',
+    rowterminator = '\n',
+    tablock
+)
+
+
+bulk insert staffs
+from 'C:\Users\User\Desktop\bikestoredatas\staffs.csv'
+with (
+    format = 'CSV',
+    firstrow = 2,
+    fieldterminator = '\t',
+    rowterminator = '\r\n',
+	keepnulls,
+    tablock
+)
+
+
+bulk insert orders
+from 'C:\Users\User\Desktop\bikestoredatas\orders.csv'
+with (
+    format = 'CSV',
+    firstrow = 2,
+    fieldterminator = ',',
+    rowterminator = '\n',
+	keepnulls,
+    tablock
+)
+
+
+bulk insert customers
+from 'C:\Users\User\Desktop\bikestoredatas\customers.csv'
+with (
+    format = 'CSV',
+    firstrow = 2,
+    fieldterminator = ',',
+    rowterminator = '\n',
+    tablock
+)
+
+-----------------------views --------------------
+
+create view vw_StoreSalesSummary 
+as
+select 
+    s.store_id,
+    s.store_name,
+    count(distinct o.order_id) as total_orders,
+    sum(oi.quantity * oi.list_price * (1 - oi.discount)) as total_revenue,
+    sum(oi.quantity * oi.list_price * (1 - oi.discount)) 
+        / count(distinct o.order_id) as avg_order_value
+from stores s
+join orders o  on s.store_id = o.store_id
+join order_items oi on o.order_id = oi.order_id
+group by s.store_id, s.store_name;
+
+--vw_TopSellingProducts: Rank products by total sales
+create view vw_TopSellingProducts
+as
+select
+	p.product_id,
+	p.product_name,
+	sum(oi.quantity) as total_units_sold,
+	sum(oi.quantity*oi.list_price * (1-oi.discount))as total_revanue,
+	rank() over (order by sum(oi.quantity * oi.list_price * (1 - oi.discount)) desc) as sales_rank
+from products p 
+join order_items oi
+on p.product_id = oi.product_id
+group by p.product_id ,p.product_name
+
+select *from vw_StoreSalesSummary
+
+-- vw_inventorystatus: items running low on stock
+drop view vw_InventoryStatus
+create view vw_InventoryStatus
+as
+select
+    st.store_id,
+    s.store_name,
+    p.product_id,
+    p.product_name,
+    st.quantity  as stock_quantity,
+    case
+        when st.quantity = 0  then 'out of stock'
+        when st.quantity <= 5 then 'critical'
+        when st.quantity <= 20 then 'low'
+        else 'sufficient'
+    end as stock_status
+from stocks st
+join stores s on st.store_id  = s.store_id
+join products p on st.product_id = p.product_id;
+
+-- verify
+select * from vw_InventoryStatus
+order by stock_quantity asc;
+
+
+-- vw_staffperformance: orders and revenue handled per staff
+create view vw_StaffPerformance
+as
+select
+    sf.staff_id,
+    sf.first_name + ' ' + sf.last_name             as staff_name,
+    count(distinct o.order_id)                      as total_orders,
+    sum(oi.quantity * oi.list_price * (1 - oi.discount)) as total_revenue
+from staffs sf
+join orders o       on sf.staff_id  = o.staff_id
+join order_items oi on o.order_id   = oi.order_id
+group by sf.staff_id, sf.first_name, sf.last_name;
+
+-- verify
+select * from vw_StaffPerformance
+order by total_revenue desc;
+
+
+-- vw_regionaltrends: revenue by city or region
+create view vw_RegionalTrends
+as
+select
+    c.city,
+    c.state,
+    count(distinct o.order_id)as total_orders,
+    sum(oi.quantity * oi.list_price * (1 - oi.discount)) as total_revenue
+from customers c
+join orders o on c.customer_id = o.customer_id
+join order_items oi on o.order_id    = oi.order_id
+group by c.city, c.state;
+
+-- verify
+select * from vw_RegionalTrends
+order by total_revenue desc;
+
+
+-- vw_salesbycategory: sales volume and margin by product category
+create view vw_SalesByCategory
+as
+select
+    cat.category_id,
+    cat.category_name,
+    count(distinct o.order_id) as total_orders,
+    sum(oi.quantity) as total_units_sold,
+    sum(oi.quantity * oi.list_price * (1 - oi.discount))as total_revenue,
+    sum(oi.quantity * oi.list_price) as gross_revenue,
+    sum(oi.quantity * oi.list_price * oi.discount)as total_discount_given,
+    round(
+        sum(oi.quantity * oi.list_price * oi.discount) /
+        sum(oi.quantity * oi.list_price) * 100
+    ,2) as discount_rate_pct
+from categories cat
+join products p on cat.category_id  = p.category_id
+join order_items oi on p.product_id= oi.product_id
+join orders o on oi.order_id= o.order_id
+group by cat.category_id, cat.category_name;
+
+-- verify
+select * from vw_SalesByCategory
+order by total_revenue desc;
+
+---stored procs 
+drop procedure if exists sp_CalculateStoreKPI;
+create procedure sp_CalculateStoreKPI
+    @store_id int
+as
+begin
+
+    -- validate store exists
+    if not exists (select 1 from stores where store_id = @store_id)
+    begin
+        print 'store not found for id: ' + cast(@store_id as varchar)
+        return
+    end
+
+    -- store info
+    select
+        store_id,
+        store_name,
+        city,
+        state
+    from stores
+    where store_id = @store_id;
+
+    -- revenue, orders, aov
+    select
+        count(distinct o.order_id) as total_orders,
+        sum(oi.quantity * oi.list_price * (1 - oi.discount)) as total_revenue,
+        sum(oi.quantity * oi.list_price * (1 - oi.discount))
+            / count(distinct o.order_id) as avg_order_value,
+        sum(oi.quantity) as total_units_sold
+    from orders o
+    join order_items oi on o.order_id = oi.order_id
+    where o.store_id = @store_id;
+
+    -- top 5 products by revenue for this store
+    select top 5
+        p.product_name,
+        sum(oi.quantity) as units_sold,
+        sum(oi.quantity * oi.list_price * (1 - oi.discount))as product_revenue
+    from orders o
+    join order_items oi on o.order_id   = oi.order_id
+    join products p     on oi.product_id = p.product_id
+    where o.store_id = @store_id
+    group by p.product_id, p.product_name
+    order by product_revenue desc;
+
+    -- staff performance for this store
+    select
+        concat_ws(' ', sf.first_name,sf.last_name)  as staff_name,
+        count(distinct o.order_id)as orders_handled,
+        sum(oi.quantity * oi.list_price * (1 - oi.discount))as revenue_generated
+    from staffs sf
+    join orders o on sf.staff_id  = o.staff_id
+    join order_items oi on o.order_id   = oi.order_id
+    where o.store_id = @store_id
+    group by sf.staff_id, sf.first_name, sf.last_name
+    order by revenue_generated desc;
+
+    -- inventory status for this store
+    select
+        p.product_name,
+        st.quantity  as stock_quantity,
+        case
+            when st.quantity = 0    then 'out of stock'
+            when st.quantity <= 5   then 'critical'
+            when st.quantity <= 20  then 'low'
+            else                         'sufficient'
+        end  as stock_status
+    from stocks st
+    join products p on st.product_id = p.product_id
+    where st.store_id = @store_id
+    order by stock_quantity asc;
+
+end;
+
+-- how to run it
+exec sp_CalculateStoreKPI @store_id = 1;  
+exec sp_CalculateStoreKPI @store_id = 2;
+exec sp_CalculateStoreKPI @store_id = 3;
+
+
+create procedure sp_GenerateRestockList
+    @store_id int,
+    @threshold int = 20    -- default low stock threshold
+as
+begin
+
+    if not exists (select 1 from stores where store_id = @store_id)
+    begin
+        print 'store not found for id: ' + cast(@store_id as varchar)
+        return
+    end
+
+    select
+        s.store_name,
+        p.product_id,
+        p.product_name,
+        b.brand_name,
+        c.category_name,
+        st.quantity as current_stock,
+        case
+            when st.quantity = 0 then 'out of stock'
+            when st.quantity <= 5 then 'critical'
+            when st.quantity <= 20 then 'low'
+        end	 as stock_status,
+        @threshold - st.quantity as units_needed
+    from stocks st
+    join stores s       on st.store_id      = s.store_id
+    join products p     on st.product_id    = p.product_id
+    join brands b       on p.brand_id       = b.brand_id
+    join categories c   on p.category_id    = c.category_id
+    where st.store_id   = @store_id
+    and   st.quantity   < @threshold
+    order by st.quantity asc;
+
+end;
+
+exec sp_GenerateRestockList @store_id = 1;
+exec sp_GenerateRestockList @store_id = 1, @threshold = 10; 
+
+drop procedure sp_CompareSalesYearOverYear
+create procedure sp_CompareSalesYearOverYear
+    @year1 int,
+    @year2 int
+as
+begin
+
+    select
+        year(o.order_date)  as order_year,
+        count(distinct o.order_id) as total_orders,
+        sum(oi.quantity) as total_units_sold,
+        sum(oi.quantity * oi.list_price * (1 - oi.discount)) as total_revenue,
+        sum(oi.quantity * oi.list_price * (1 - oi.discount))
+            / count(distinct o.order_id) as avg_order_value
+    from orders o
+    join order_items oi on o.order_id = oi.order_id
+    where year(o.order_date) in (@year1, @year2)
+    group by year(o.order_date)
+    order by order_year;
+
+    -- year over year difference
+select
+        @year1 as year1,
+        @year2 as year2,
+        sum(case when year(o.order_date) = @year2 then oi.quantity * oi.list_price * (1 - oi.discount) end) -
+        sum(case when year(o.order_date) = @year1 then oi.quantity * oi.list_price * (1 - oi.discount) end)as revenue_difference,
+        round(
+            (sum(case when year(o.order_date) = @year2 then oi.quantity * oi.list_price * (1 - oi.discount) end) -
+ sum(case when year(o.order_date) = @year1 then oi.quantity * oi.list_price * (1 - oi.discount) end)) /
+ sum(case when year(o.order_date) = @year1 then oi.quantity * oi.list_price * (1 - oi.discount) end) * 100, 2)as revenue_growth_pct
+from orders o
+    join order_items oi on o.order_id = oi.order_id
+    where year(o.order_date) in (@year1, @year2);
+
+end;
+
+exec sp_CompareSalesYearOverYear @year1 = 2016, @year2 = 2017;
+exec sp_CompareSalesYearOverYear @year1 = 2017, @year2 = 2018;
+
+create procedure sp_GetCustomerProfile
+    @customer_id int
+as
+begin
+
+    if not exists (select 1 from customers where customer_id = @customer_id)
+    begin
+        print 'customer not found for id: ' + cast(@customer_id as varchar)
+        return
+    end
+
+    -- customer info
+    select
+        customer_id,
+        concat_ws(' ',first_name,last_name) as customer_name,
+        email,
+        phone,
+        city,
+        state
+    from customers
+    where customer_id = @customer_id;
+
+    -- overall spending summary
+    select
+        count(distinct o.order_id)                                      as total_orders,
+        sum(oi.quantity)                                                 as total_units_bought,
+        sum(oi.quantity * oi.list_price * (1 - oi.discount))            as total_spend,
+        sum(oi.quantity * oi.list_price * (1 - oi.discount))
+            / count(distinct o.order_id)as avg_order_value,
+        min(o.order_date) as first_order_date,
+        max(o.order_date) as last_order_date
+    from orders o
+    join order_items oi on o.order_id = oi.order_id
+    where o.customer_id = @customer_id;
+
+    -- top 5 most bought products
+    select top 5
+        p.product_name,
+        c.category_name,
+        sum(oi.quantity) as total_units_bought,
+        sum(oi.quantity * oi.list_price * (1 - oi.discount)) as total_spent_on_product
+    from orders o
+    join order_items oi on o.order_id    = oi.order_id
+    join products p     on oi.product_id = p.product_id
+    join categories c   on p.category_id = c.category_id
+    where o.customer_id = @customer_id
+    group by p.product_id, p.product_name, c.category_name
+    order by total_units_bought desc;
+
+end;
+
+ exec sp_GetCustomerProfile @customer_id = 1;
+exec sp_GetCustomerProfile @customer_id = 2;
+
+--Business KPIs
+
+--1.Total revenue
+
+select sum(total_revenue) as company_total_revenue
+from vw_StoreSalesSummary;
+
+--2.Average Order Value (AOV)
+select store_name, avg_order_value
+from vw_StoreSalesSummary;
+
+--3. inventory turnover 
+
+-- items moving slow (high stock, low sales)
+select store_name, 
+	   product_name,
+	   stock_quantity,
+	   stock_status
+from vw_InventoryStatus
+order by stock_quantity desc
+
+--4.Revenue by store
+select store_name, 
+	   total_revenue,
+	   total_orders
+from vw_StoreSalesSummary
+order by total_revenue desc;
+
+--5.Gross profit per catagory
+select 
+    category_name,
+    total_revenue,
+    total_discount_given,
+    discount_rate_pct
+from vw_SalesByCategory
+order by total_revenue desc;
+--6. Sales by Brand
+
+create view vw_SalesByBrand as
+select
+    b.brand_id,
+    b.brand_name,
+    sum(oi.quantity)as total_units_sold,
+    sum(oi.quantity * oi.list_price * (1 - oi.discount))as total_revenue
+from brands b
+join products p on b.brand_id= p.brand_id
+join order_items oi on p.product_id= oi.product_id
+group by b.brand_id, b.brand_name;
+
+select * from vw_SalesByBrand
+order by brand_id
+
+--7. Staff Revenue Contribution 
+
+select staff_name, total_orders, total_revenue
+from vw_StaffPerformance
+order by total_revenue desc;
+
+
+
